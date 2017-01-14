@@ -1,105 +1,78 @@
 <!-- .slide: data-background="media/img/aframe.jpg" -->
 
 <div class="talk-title">
-  <h1>A-Frame</h1>
-  <p>VR体験の構築用ウェブフレームワーク</p>
-  <p class="talk-info">
-    @andgokevin | Mozilla VR | **aframe.io**
+  <h1>WebVR とそれを支える技術</h1>
+  <p>  
+    Mozilla Japan 清水智公 | @chikoski
   </p>
 </div>
 
-<!-- NOTES -->
-- Onboard web developers into the 3D and VR world with easy-to-use tools
-- Prototype WebVR experiences faster
+---
 
-------
+<blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">I made some <a href="https://twitter.com/hashtag/webvr?src=hash">#webvr</a> fireworks for tonights NYE celebration. Check it out at <a href="https://t.co/Eedi71bXor">https://t.co/Eedi71bXor</a> ! <a href="https://t.co/gGVgTUJW8o">pic.twitter.com/gGVgTUJW8o</a></p>&mdash; Casey Yee (@whoyee) <a href="https://twitter.com/whoyee/status/815393296335765504">January 1, 2017</a></blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
 
-## VRエコシステムにおける軋轢
+---
+
+## VR コンテンツ流通の障壁
 
 <div class="captioned-image-row">
   <div>
     <img data-src="media/img/gatekeeper.png">
-    <i>ゲートキーパー</i>
+    <i>Gatekeeper</i>
   </div>
   <div>
     <img data-src="media/img/downloads-installs.png">
-    <i>インストール</i>
+    <i>Installation</i>
   </div>
   <div>
     <img data-src="media/img/closed-door.png">
-    <i>クローズド</i>
+    <i>Closed</i>
   </div>
 </div>
 
-<!-- NOTES -->
-- App stores and corporations control distribution: can take down or block content
-- Downloads / installs are a barrier to consumption: small business pages
-- Closed ecosystem: proprietary engines, steep learning curves, siloed experiences, fragmentation
-- We want VR to be successful, so we want a platform without these points of friction. The answer is WebVR...
+---
 
-------
-
-# WebVR
-
-**Web**の利点を用いたオープンなVRプラットフォーム
+## WebVR：**Web** の特徴を活用した VR プラットフォーム
 
 <div class="captioned-image-row">
   <div>
     <img data-src="media/img/web-is-open.png">
-    <i>オープン</i>
+    <i>Open</i>
   </div>
   <div>
     <img data-src="media/img/web-is-connected.png">
-    <i>コネクト</i>
+    <i>Connected</i>
   </div>
   <div>
     <img data-src="media/img/web-is-instant.png">
-    <i>インスタント</i>
+    <i>Instant</i>
   </div>
 </div>
 
+---
+
+<iframe class="stretch" src="http://www.360syria.com/intro"></iframe>
+
+---
+
+<!-- .slide: data-background-video="media/video/a-painter.mp4" data-background-video-muted="true" data-state="state--bg-dark" -->
+
+## A-Painter
+
+[Live demo](https://aframe.io/a-painter/)
+
 <!-- NOTES -->
-WebVR is...virtual reality in the browser, powered by the Internet
+- A-Frame is very powerful
+- 90+fps room-scale TiltBrush experience in a few weeks with just A-Frame
 
-Open:
-- Anyone can publish
-- Open source culture with open standards
-
-Connected:
-- Traverse worlds
-
-Instant:
-- Click a link on Twitter or Weibo, immediate VR experiences
-- No installs
-- Imagine for long tail experiences: shopping & personal spaces
-- Great for long tail bite-sized experiences
-
-Transition:
-- Web has advantages that make it the best platform for the people
-- Need to act to make it reality, can't wait for VR to bake and crystallize
-- Get involved
-
-------
+---
 
 <img class="stretch" data-src="media/img/webvr.png">
 
-WebGLにヘッドセットへのレンダリングやVRセンサーへのアクセスを可能にしたブラウザAPI
-
 https://w3c.github.io/webvr/
 
-<!-- NOTES -->
-API:
-- Optimized rendering path to headsets
-- Access position and rotation (pose) data
-
-History:
-- Initial WebVR API by Mozilla
-- Working W3C community group
-- Mozilla, Google, Samsung, Microsoft, community currently iterating WebVR 1.0 API
-
-Not just a specification, it's implemented...
-
-------
+----
 
 <div class="captioned-image-row">
   <div>
@@ -124,8 +97,6 @@ Not just a specification, it's implemented...
   </div>
 </div>
 
-https://mozvr.com
-
 https://iswebvrready.com
 
 <!-- NOTES -->
@@ -134,7 +105,128 @@ https://iswebvrready.com
 - Mobile Polyfill: use device motion / orientation sensors to polyfill on smartphones
 - With all the browsers behind it...
 
-------
+----
+
+### HMD の取得
+
+~~~javascript
+const canvas = document.querySelector("canvas");
+navigator.getVRDisplays()
+   .then(displayList => {
+      if(!displayList.length || displayList[0].isPresenting){
+         return Promise.reject(displayList);
+      }
+      return Promise.resolve(displayList[0])
+    })
+   .then(display => display.requestPresent({source: canvs}))
+   .then(display => enterVR(display));
+~~~
+
+----
+
+### アニメーションループ
+
+~~~javascript
+function enterVR(display){
+  const update = () => {
+    display.requestAnimationFrame(update);
+    display.getFrameData(frameData);
+    const pose = display.getPose(); // 位置と向きのデータを持つオブジェクトを取得
+    const position = pose.position; // 現在の位置を取得
+    const orientation = pose.orientation; // 現在の向きを取得
+    const x = position[0];
+    const orientationX = orientation[0];     
+     // 描画
+     display.submitData();
+  };
+  display.requestAnimationFrame(update);
+}
+~~~
+
+---
+
+## Link traversal
+
+<iframe class="stretch" src="https://321c4.github.io/aframe-link-demo/"></iframe>
+
+----
+
+![リンク解決の流れ](media/img/chart-link-traversal.png)
+
+`window.location.href` を利用してページを遷移
+
+----
+
+~~~javascript
+var canvas = document.querySelector('canvas#vr-canvas');
+
+navigator.vr.getReferringDisplays().then(displays => {  
+  if (!displays.length || displays[0].isPresenting) {
+    return;
+  }
+  return displays[0].requestPresent([
+    {source: canvas}
+  ]).then(
+    enterVR(display)
+  );
+});
+~~~
+
+----
+
+~~~javascript
+// Detect a VR display is available and accessible (e.g., permissions) on the user’s system.
+var vrButton = document.querySelector('button#vr-button');  
+vrButton.disabled = true;
+
+navigator.vr.getAvailability().then(function (isAvailable) {  
+  vrButton.disabled = !isAvailable;
+});
+
+navigator.vr.addEventListener('availabilitychange', function (event) {  
+  vrButton.disabled = !e.value;
+});
+
+// Present content to the first available VR display.
+navigator.vr.requestDisplays().then(function (displays) {  
+  if (!displays.length || !displays[0].isPresenting) {
+    return;
+  }
+  return displays[0].requestPresent([
+    {source: canvas}
+  ]).then(
+    enterVR(display)
+  );
+});
+~~~
+
+----
+
+~~~javascript    
+function enterVR (display) {  
+  // Render a single frame of VR data.
+  var onVRFrame = function () {
+    // Schedule the next frame’s callback.
+    display.requestAnimationFrame(onVRFrame);
+
+    // Poll the `VRDisplay` instance for the current frame’s matrices and pose.
+    display.getFrameData(frameData);
+
+    // …
+    // Your render loop code goes here for rendering viewports for left and right eyes.
+    // …
+
+    // Indicate that we are ready to rendered the frame to the VRDisplay.
+    display.submitFrame();
+  };
+
+  return function () {
+     display.requestAnimationFrame(onVRFrame);
+  };
+}
+~~~     
+
+---
 
 <!-- .slide: data-background-video="media/video/boilerplate.mp4" data-state="state--bg-dark" -->
 
@@ -159,37 +251,26 @@ https://iswebvrready.com
 - Boilerplate needs updating with new versions of WebVR, three.js, and browser quirks
 - Encapsulate all of that into one line...
 
-------
+----
 
-## Hello World
+<div class="captioned-image-row">
+  <div>
+    <img data-src="media/img/aframe.png">
+    <i><a href="https://aframe.io/">A-Frame</a></i>
+  </div>
+  <div>
+    <img data-src="media/img/unity-logo-rgb.png">
+    <i><a href="https://unity3d.com/">Unity</a></i>
+  </div>
+  <div>
+    <img data-src="media/img/playcanvas.png">
+    <i><a href="https://playcanvas.com/">PlayCanvas</a></i>
+  </div>
+</div>
 
-<!-- .slide: data-background="media/img/aframe.png" data-transition="slide-in none" -->
+----
 
-```html
-<html>
-  <script src="https://aframe.io/releases/0.3.2/aframe.min.js"></script>
-  <a-scene>
-
-
-
-
-
-  </a-scene>
-</html>
-```
-<!-- .element: class="stretch" -->
-
-<!-- NOTES -->
-- Just HTML
-- Drop a script tag, no build steps
-- Using Custom HTML Elements
-- One line of HTML `<a-scene>` handles
-  - canvas, camera, renderer, lights, controls, render loop, WebVR polyfill, VREffect
-- Put stuff inside our scene...
-
-------
-
-## ハロー・ワールド
+## Hello world with A-Frame
 
 <!-- .slide: data-background="media/img/aframe.png" data-transition="fade-in slide-out" -->
 
@@ -213,7 +294,7 @@ https://iswebvrready.com
 - Encapsulated: copy-and-paste HTML anywhere else and still work, no state or variables
 - Quickly look at a live example...
 
-------
+---
 
 ## ハロー・メタバース
 
@@ -229,11 +310,9 @@ https://iswebvrready.com
 - Could open up the DOM Inspector to change values live
 - Since it's just HTML...
 
-------
+---
 
 <!-- .slide: data-background="media/img/aframe.jpg" -->
-
-## これら全てで動きます
 
 <div class="captioned-image-row">
   <div>
@@ -269,9 +348,9 @@ https://iswebvrready.com
 - All tools were on top of the notion of HTML
 - Under the hood, A-Frame is an extensible, declarative framework for three.js...
 
-------
+---
 
-# エンティティ・コンポーネント・システム
+# Entity - Component system
 
 <!-- .slide: data-background="media/img/minecraft-blocks.png" -->
 
@@ -284,11 +363,9 @@ https://iswebvrready.com
 - 2D web where every element was fixed
 - 3D/VR is different, objects of infinite types and complexities, need an easy way to build up different kinds of objects
 
-------
+----
 
 <!-- .slide: data-background="media/img/minecraft-blocks.png" data-transition="slide-in none" -->
-
-## エンティティを構成する
 
 ```html
 <a-entity>
@@ -300,9 +377,7 @@ https://iswebvrready.com
 - By itself, has no appearance, behavior, functionality
 - Plug in components to add appearance, behavior, functionality
 
-------
-
-## エンティティを構成する
+----
 
 <!-- .slide: data-background="media/img/minecraft-blocks.png" data-transition="none" -->
 
@@ -313,9 +388,7 @@ https://iswebvrready.com
 ```
 <!-- .element: class="stretch" -->
 
-------
-
-## エンティティを構成する
+----
 
 <!-- .slide: data-background="media/img/minecraft-blocks.png" data-transition="none" -->
 
@@ -327,9 +400,7 @@ https://iswebvrready.com
 ```
 <!-- .element: class="stretch" -->
 
-------
-
-## エンティティを構成する
+----
 
 <!-- .slide: data-background="media/img/minecraft-blocks.png" data-transition="none" -->
 
@@ -343,9 +414,7 @@ https://iswebvrready.com
 ```
 <!-- .element: class="stretch" -->
 
-------
-
-## エンティティを構成する
+----
 
 <!-- .slide: data-background="media/img/minecraft-blocks.png" data-transition="none" -->
 
@@ -358,9 +427,7 @@ https://iswebvrready.com
 ```
 <!-- .element: class="stretch" -->
 
-------
-
-## エンティティを構成する
+----
 
 <!-- .slide: data-background="media/img/minecraft-blocks.png" data-transition="none" -->
 
@@ -374,9 +441,9 @@ https://iswebvrready.com
 ```
 <!-- .element: class="stretch" -->
 
-------
+---
 
-## コンポーネントを登録する
+## コンポーネントの作成
 
 <!-- .slide: data-background="media/img/minecraft-blocks.png" data-transition="none" -->
 
@@ -415,7 +482,7 @@ AFRAME.registerComponent('mycomponent', {
   - `data`: component data parsed from HTML
   - `object3D`: three.js object
 
-------
+---
 
 <!-- .slide: data-background="media/img/standard-components.png" data-background-size="contain" -->
 
@@ -423,7 +490,7 @@ AFRAME.registerComponent('mycomponent', {
 - These are some components that ship with A-Frame
 - A-Frame is fully extensible at its core so...
 
-------
+---
 
 <!-- .slide: data-background="media/img/community-components.png" data-background-size="contain" -->
 
@@ -436,16 +503,14 @@ AFRAME.registerComponent('mycomponent', {
 - Advanced developers empowering other developers
 - Working on collecting these components...
 
-------
+---
 
 <div class="icon-title">
   <img data-src="media/img/registry.png" width="64">
-  <h2>レジストリ</h2>
+  <h2>コンポーネントレジストリー</h2>
 </div>
 
 <!-- .slide: data-background="media/img/aframe-side.png" -->
-
-A-Frameコンポーネントやシェーダーの収集された場所
 
 <a class="stretch" href="https://aframe.io/aframe-registry">
   <video loop data-src="media/video/registrypreview.mp4" data-autoplay></video>
@@ -456,9 +521,9 @@ A-Frameコンポーネントやシェーダーの収集された場所
 - Like a store of components that we make sure work well
 - People can browse and search for components or install them....
 
-------
+---
 
-## Inspector（インスペクタ）
+## インスペクター
 
 <!-- .slide: data-background="media/img/inspector.png" data-state="state--bg-dark" -->
 
@@ -466,19 +531,7 @@ A-Frameのためのヴィジュアルツール。`<ctrl>+<alt>+i`だけ。
 
 <div class="stretch" data-aframe-scene="scenes/80s.html"></div>
 
-------
-
-<!-- .slide: data-background-video="media/video/a-painter.mp4" data-background-video-muted="true" data-state="state--bg-dark" -->
-
-## A-Painter（A-ペインター）
-
-ブラウザ内のVRでペイントする
-
-<!-- NOTES -->
-- A-Frame is very powerful
-- 90+fps room-scale TiltBrush experience in a few weeks with just A-Frame
-
-------
+---
 
 # aframe.io
 
