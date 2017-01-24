@@ -200,32 +200,6 @@ navigator.vr.requestDisplays().then(function (displays) {
 });
 ~~~
 
-----
-
-~~~javascript    
-function enterVR (display) {  
-  // Render a single frame of VR data.
-  var onVRFrame = function () {
-    // Schedule the next frame’s callback.
-    display.requestAnimationFrame(onVRFrame);
-
-    // Poll the `VRDisplay` instance for the current frame’s matrices and pose.
-    display.getFrameData(frameData);
-
-    // …
-    // Your render loop code goes here for rendering viewports for left and right eyes.
-    // …
-
-    // Indicate that we are ready to rendered the frame to the VRDisplay.
-    display.submitFrame();
-  };
-
-  return function () {
-     display.requestAnimationFrame(onVRFrame);
-  };
-}
-~~~     
-
 ---
 
 <!-- .slide: data-background-video="media/video/boilerplate.mp4" data-state="state--bg-dark" -->
@@ -251,24 +225,7 @@ function enterVR (display) {
 - Boilerplate needs updating with new versions of WebVR, three.js, and browser quirks
 - Encapsulate all of that into one line...
 
-----
-
-<div class="captioned-image-row">
-  <div>
-    <img data-src="media/img/aframe.png">
-    <i><a href="https://aframe.io/">A-Frame</a></i>
-  </div>
-  <div>
-    <img data-src="media/img/unity-logo-rgb.png">
-    <i><a href="https://unity3d.com/">Unity</a></i>
-  </div>
-  <div>
-    <img data-src="media/img/playcanvas.png">
-    <i><a href="https://playcanvas.com/">PlayCanvas</a></i>
-  </div>
-</div>
-
-----
+---
 
 ## Hello world with A-Frame
 
@@ -293,22 +250,6 @@ function enterVR (display) {
 - Readable: HTML arguably most accessible language in computing
 - Encapsulated: copy-and-paste HTML anywhere else and still work, no state or variables
 - Quickly look at a live example...
-
----
-
-## ハロー・メタバース
-
-<i>by Ada Rose Edwards (@lady_ada_king)</i>
-
-<!-- .slide: data-background="media/img/metaverse.png" -->
-
-<div class="stretch" data-aframe-scene="scenes/80s.html"></div>
-
-<!-- NOTES -->
-- A-Frame scene by Ada Rose Edwards running from inside my HTML slides
-- Works on desktop, Android, iOS, Samsung Gear VR, Oculus Rift, HTC Vive
-- Could open up the DOM Inspector to change values live
-- Since it's just HTML...
 
 ---
 
@@ -527,7 +468,7 @@ AFRAME.registerComponent('mycomponent', {
 
 <!-- .slide: data-background="media/img/inspector.png" data-state="state--bg-dark" -->
 
-A-Frameのためのヴィジュアルツール。`<ctrl>+<alt>+i`だけ。
+`<ctrl>+<alt>+i` で起動できます
 
 <div class="stretch" data-aframe-scene="scenes/80s.html"></div>
 
@@ -538,15 +479,15 @@ A-Frameのためのヴィジュアルツール。`<ctrl>+<alt>+i`だけ。
 <div class="captioned-image-row">
   <div>
     <img data-src="media/img/github.png">
-    <i>80名のcontributorと4000名のStargazers</i>
+    <i>80 contributors 4000 stargazers</i>
   </div>
   <div>
     <img data-src="media/img/slack.png">
-    <i>2000名のSlackメンバー</i>
+    <i>2000 members</i>
   </div>
   <div>
     <img data-src="media/img/scene-collage-circle.png">
-    <i>数百の特色あるプロジェクト</i>
+    <i>Hundreds projects</i>
   </div>
 </div>
 
